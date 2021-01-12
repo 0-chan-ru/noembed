@@ -170,7 +170,8 @@ sub json_res{
     200,
     [
       @headers,
-      'Content-Type', 'text/javascript; charset=utf-8',
+      #'Content-Type', 'text/javascript; charset=utf-8',
+      'Content-Type', 'application/json',
       'Content-Length', length $body
     ],
     [$body]
@@ -202,7 +203,17 @@ sub is_shorturl {
 sub find_provider {
   my ($self, $req) = @_;
 
+  # dirty hack for priority any providers over oEmbed provider (block YouTube overloading by oEmbed provider)
   for my $provider (@{$self->{providers}}) {
+    if ($provider->isa('Noembed::Provider::oEmbed')) {
+       next;
+    }
+    return $provider if $provider->matches($req);
+  }
+  for my $provider (@{$self->{providers}}) {
+    if (!$provider->isa('Noembed::Provider::oEmbed')) {
+       next;
+    }
     return $provider if $provider->matches($req);
   }
 
