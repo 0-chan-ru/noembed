@@ -1,0 +1,19 @@
+[Unit]
+Description=noembed server
+After=network.target
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=5
+StartLimitInterval=6s
+StartLimitBurst=1
+User=http
+Group=http
+WorkingDirectory=/srv/http/noembed
+ExecStart=/usr/bin/site_perl/plackup -Ilib ./bin/noembed.psgi
+ExecReload=/bin/kill -USR2 $MAINPID
+ExecStop=/bin/kill -s TERM $MAINPID
+
+[Install]
+WantedBy=multi-user.target
